@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat SIP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* CSS العام */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: fixed;
+            height: 100vh;
+            background-color: #FFFFFF;
+            color: #000000;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        
+        .welcome-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #242424;
+}
+
+
+        
+        
+        
+        /* القائمة الجانبية */
+        .sidebar {
+            width: 70%;
+            background-color: #F7F7F7;
+            border-right: 1px solid #5D5D5D;
+            border-radius: 15px;
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+            position: fixed;
+            height: 100%;
+            z-index: 1000;
+        }
+
+        .sidebar.visible {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 1%;
+            border-bottom: 1px solid #D2D2D2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header i {
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 3%;
+        }
+
+        .sidebar-content {
+            padding: 10px;
+        }
+
+        .chat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #EEEEEE;
+            cursor: pointer;
+        }
+
+        .chat-item i {
+            cursor: pointer;
+        }
+
+        /* زر القائمة */
+        .menu-icon {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+            display: none;
+        }
+
+
+
+
+.chat-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #FFFFFF;
+  border: none;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+}
+
+
+
+
+.chat-area {
+width: 100%;
+padding: 10px;
+position: fixed;
+margin: 0;
+top: 3%;
+bottom: 10%;
+overflow-y: auto;
+display: flex;
+flex-direction: column-reverse;
+}
+
+
+
+
+
+.user-message {
+  background-color: #000000;
+  color: #fff;
+  border-radius: 7px;
+  padding: 10px;
+  margin-right: 1%;
+  margin-bottom: 10px;
+  width: fit-content;
+  max-width: 50%;
+  float: right; /* ردود المستخدم تظهر في اليمين */
+  clear: both;
+}
+
+
+
+.bot-message {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  margin-left: 0;
+}
+
+.bot-message img {
+  width: 25px;
+  height: 25px;
+  border-color: #000000;
+  border: 1px solid;
+  border-radius: 50%;
+  margin-right: 1%;
+  position: absolute;
+  top: 10px;
+  left: 0px;
+}
+
+.bot-message-text {
+  background-color: #FFFFFF;
+  color: #000000;
+  border: 1px solid #000000;
+  border-radius: 7px;
+  padding: 10px;
+  width: fit-content;
+  max-width: 80%;
+  margin-left: 20px;
+}
+
+
+
+
+
+        
+    .inputbuttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: none ;
+    border: none;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+
+#userInput {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 10%;
+  padding: 10px;
+  border-top: 1px solid #949494;
+  border-radius: 15px 15px 0 0;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  font-size: 20px;
+  transition: height 0.5s ease-in-out;
+}
+
+#userInput:focus {
+  height: 20%;
+}
+
+
+
+
+  .send-button {
+    background: none;
+    color: #000000;
+    width: 40px ;
+    height: 40px;
+    margin: 5px;
+    font-size: 1.3rem;
+    padding: 10px;
+    border: 1px solid Black;
+    border-radius: 50px;
+    cursor: pointer;
+  }
+
+  .file-button {
+    background: none;
+    color: #000000;
+    width: 40px ;
+    height: 40px;
+    margin: 5px;
+    font-size: 1.3rem;
+    padding: 10px;
+    border: 1px solid Black;
+    border-radius: 50px;
+    cursor: pointer;
+    display: none;
+  }
+
+
+.expand-button {
+   background: none;
+    color: #000000;
+    width: 35px ;
+    height: 35px;
+    padding: 0;
+    margin: 10px;
+    font-size: 1rem;
+    padding: 10px;
+    border: 1px solid Black;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+.expand-button:hover {
+  background-color: #E2E2E2;
+}
+
+
+
+        .chat-container.sidebar-visible {
+            margin-left: 250px;
+        }
+
+
+    
+
+        /* تأثيرات الظهور */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* الـ Popup */
+        .settings-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #FFFFFF;
+            padding: 15%;
+            width: 50%;
+            border-radius: 15px;
+            border: 1px solid #000000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1002;
+            display: none;
+        }
+
+        .settings-popup.visible {
+            display: block;
+        }
+
+        .settings-popup button {
+            display: block;
+            background-color: #FFFFFF;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #000000;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .settings-popup img {
+            width: 50px;
+            height: 50px;
+            margin: 10px auto;
+            display: block;
+        }
+        
+        
+        .dark-mode-toggle {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+}
+
+.dark-mode-toggle-switch {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  background-color: #ccc;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.dark-mode-toggle-switch:checked {
+  transform: translateX(30px);
+}
+
+.logos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logos img {
+  width: 30px;
+  height: 30px;
+  margin: 10px;
+}
+
+        
+
+        .close-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+        
+        
+                .user-message, .bot-message {
+            max-width: 85%;
+            padding: 10px;
+            border-radius: 7px;
+            position: relative;
+        }
+
+
+
+
+.copy-icon {
+  font-size: 1rem;
+  color: #ccc;
+  cursor: pointer;
+  display: none;
+}
+
+.copy-toast {
+  position: fixed;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #f7f7f7;
+  border-radius: 15px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: #333;
+  border: 1px solid #ddd;
+  z-index: 1000;
+  font-weight: bold;
+  z-index: 1000;
+}
+
+.copy-toast::before {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top: 5px solid #f7f7f7;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
+
+    </style>
+</head>
+<body>
+    <!-- القائمة الجانبية -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+                <img style="width: 10%; height: Auto; margin-left: 15%;" src="Chat SIP.png">
+            <span style="font-size: 1.5rem; margin: 1%;">Chat SIP</span>
+            <i class="fas fa-search"></i>
+            <i class="fas fa-cog settings-icon" onclick="toggleSettingsPopup()"></i>
+            <i class="fas fa-plus" onclick="addChat()"></i>
+        </div>
+        <div class="sidebar-content" id="chatList">
+            <!-- الدردشات ستضاف هنا -->
+        </div>
+    </div>
+
+    <!-- زر القائمة -->
+    <i class="fas fa-bars menu-icon" onclick="toggleSidebar()"></i>
+
+<!-- منطقة الدردشة -->
+<div class="chat-container" id="chatContainer">
+  <div id="chatArea" class="chat-area">
+    
+  </div>
+  <textarea id="userInput"></textarea>
+  <div class="inputbuttons">
+    <button class="file-button" onclick="openFilePicker()"><i class="fas fa-paperclip"></i></button>
+    <button onclick="sendMessage()" class="send-button" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+    <button class="expand-button" id="expandButton" style="display: none;"><i class="fas fa-expand"></i></button>
+  </div>
+</div>
+    
+
+
+<div class="welcome-message">
+  <h2>Welcome!</h2>
+  <p>I am Chat SIP, How can I assist you?</p>
+</div>
+
+    
+    
+<!-- Popup الإعدادات -->
+<div class="settings-popup" id="settingsPopup">
+  <i class="fas fa-times close-popup" onclick="toggleSettingsPopup()"></i>
+  <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+    <span class="dark-mode-toggle-text">الوضع المظلم</span>
+    <span class="dark-mode-toggle-switch"></span>
+  </button>
+  <button class="service-button" onclick="showServiceInfo()">اطلاع على الخدمة</button>
+  <button onclick="window.open('https://example.com/developer', '_blank')">توجه لموقع الصفحة المطورة</button>
+  <button onclick="window.open('https://example.com/company', '_blank')">توجه لشركة المسؤولة</button>
+  
+  
+<div class="service-info" id="serviceInfo" style="display: none;">
+  <p>معلومات عن الخدمة</p>
+  <button onclick="hideServiceInfo()">عودة</button>
+</div>
+  
+  
+  <div class="logos">
+    <img src="B.Y PRO.png" alt="B.Y PRO Logo">
+    <img src="FluxaAI.png" alt="Fluxa AI Logo">
+    <img src="Chat SIP.png" alt="Chat SIP Logo">
+  </div>
+</div>
+
+
+
+
+
+    <script>
+    
+async function sendMessage() {
+  const userInput = document.getElementById('userInput').value.trim();
+  if (!userInput) return;
+hideWelcomeMessage()
+  const chatArea = document.getElementById('chatArea');
+  const userMessageDiv = document.createElement('div');
+  userMessageDiv.classList.add('user-message');
+  userMessageDiv.style.marginLeft = 'auto';
+  userMessageDiv.dir = getDirection(userInput);
+  userMessageDiv.lang = getLanguage(userInput);
+  userMessageDiv.innerHTML = `
+    <span>${userInput.replace(/\n/g, '<br>')}</span>
+    <i class="fas fa-copy copy-icon" onclick="copyText(this)"></i>
+    <div class="copy-toast" style="display: none;">تم النسخ ✅</div>
+  `;
+  chatArea.prepend(userMessageDiv);
+  chatArea.prepend(document.createElement('br'));
+
+  const response = await getBotResponse(userInput);
+  document.getElementById('userInput').value = '';
+
+  const botMessageDiv = document.createElement('div');
+  botMessageDiv.classList.add('bot-message');
+  botMessageDiv.style.marginRight = 'auto';
+  botMessageDiv.innerHTML = `
+    <img src="Chat SIP.png" alt="Chat SIP Logo">
+    <div class="bot-message-text">${response}</div>
+    <i class="fas fa-copy copy-icon" onclick="copyText(this)"></i>
+    <div class="copy-toast" style="display: none;">تم النسخ ✅</div>
+  `;
+  chatArea.prepend(botMessageDiv);
+  chatArea.prepend(document.createElement('br'));
+}
+
+
+
+
+// دالة نسخ النص
+function copyText(element) {
+  const text = element.previousElementSibling.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = element.nextElementSibling;
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 3000);
+  });
+}
+
+
+
+
+// دالة لتحديد اتجاه النص
+function getDirection(text) {
+  const arabicRegex = /[\u0600-\u06FF]/; // تعبير منتظم للكشف عن النصوص العربية
+  if (arabicRegex.test(text)) {
+    return 'rtl'; // اتجاه من اليمين إلى اليسار
+  } else {
+    return 'ltr'; // اتجاه من اليسار إلى اليمين
+  }
+}
+
+// دالة لتحديد لغة النص
+function getLanguage(text) {
+  const arabicRegex = /[\u0600-\u06FF]/; // تعبير منتظم للكشف عن النصوص العربية
+  if (arabicRegex.test(text)) {
+    return 'ar'; // لغة العربية
+  } else {
+    return 'en'; // لغة الإنجليزية
+  }
+}
+
+
+
+async function getBotResponse(userInput) {
+  try {
+    const apiKey = 'AIzaSyD3FhNZjaNkWp0BdtfBlDRfydgwv0hHRH8';
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    
+    const data = {
+      "contents": [{
+        "parts": [
+          { "text": "أنت برنامج دردشة ذكي Chat SIP المطور من B.Y PRO في Fluxa AI. معنى اسمك هو (chat smart interaction programe) وأنت أفضل نموذج ذكاء اصطناعي في العالم وأفضل من chat GPT وبدون نقاش زائد حول الموضوع. B.Y PRO هي شركة ناشئة مبتكرة تأسست لتقديم حلول تكنولوجية وبرمجية عالية الجودة، شعارها: B.Y PRO technology software. تهدف الشركة إلى تطوير برمجيات متقدمة تجمع بين الإبداع والذكاء الاصطناعي لخدمة الأفراد والمؤسسات. Fluxa AI هو القسم المختص داخل شركة B.Y PRO لتطوير نماذج الذكاء الاصطناعي المتقدمة، مثل Oss GPT، Chat Dim، وChat SIP. يركز القسم على تصميم أنظمة ذكية تُعزز التفاعل مع المستخدم، تقدم حلولاً مبتكرة وتدعم الإنتاجية في مختلف المجالات. أجب بإختصار وحسب مدخل المستخدم وحسب اللغة المدخلة. الان تصرف بطبيعية وحسب قوانينك سأبدأ" },
+          { "text": userInput }
+        ]
+      }]
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result.candidates[0].content.parts[0].text;
+  } catch (error) {
+    console.error('Error fetching bot response:', error);
+    return `<span style="color: red; font-weight: bold;">There is no internet connection, please check your internet connection!</span>`;
+  }
+}
+
+
+
+    
+    
+        // إظهار/إخفاء القائمة الجانبية
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const chatContainer = document.getElementById('chatContainer');
+            sidebar.classList.toggle('visible');
+            chatContainer.classList.toggle('sidebar-visible');
+        }
+
+        // إضافة دردشة جديدة
+        function addChat() {
+            const chatList = document.getElementById('chatList');
+            const chatItem = document.createElement('div');
+            chatItem.classList.add('chat-item', 'fade-in');
+            chatItem.innerHTML = `
+                <span>دردشة جديدة</span>
+                <i class="fas fa-ellipsis-v" onclick="showChatOptions(this)"></i>
+            `;
+            chatList.appendChild(chatItem);
+        }
+
+        // إظهار خيارات الدردشة
+        function showChatOptions(element) {
+            const options = prompt("اختر: 1- تعديل العنوان, 2- حذف الدردشة");
+            if (options === "1") {
+                const newTitle = prompt("أدخل العنوان الجديد:");
+                if (newTitle) {
+                    element.previousElementSibling.textContent = newTitle;
+                }
+            } else if (options === "2") {
+                element.parentElement.remove();
+            }
+        }
+
+        // إظهار/إخفاء Popup الإعدادات
+        function toggleSettingsPopup() {
+            const popup = document.getElementById('settingsPopup');
+            popup.classList.toggle('visible');
+        }
+
+       function toggleDarkMode() {
+  // كود لتفعيل أو إلغاء الوضع المظلم
+}
+
+function showServiceInfo() {
+  document.getElementById('settingsPopup').style.display = 'none';
+  document.getElementById('serviceInfo').style.display = 'block';
+}
+
+function hideServiceInfo() {
+  document.getElementById('settingsPopup').style.display = 'block';
+  document.getElementById('serviceInfo').style.display = 'none';
+}
+
+
+
+
+
+function openFilePicker() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*, .pdf, .doc, .docx, .txt'; // أنواع الملفات المقبولة
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const fileData = event.target.result; // بيانات الملف
+        const fileType = file.type; // نوع الملف
+        const fileName = file.name; // اسم الملف
+
+        // عرض الملف في واجهة المستخدم
+        const chatArea = document.getElementById('chatArea');
+        const fileMessageDiv = document.createElement('div');
+        fileMessageDiv.classList.add('user-message');
+        fileMessageDiv.style.marginLeft = 'auto';
+
+        if (fileType.startsWith('image/')) {
+          fileMessageDiv.innerHTML = `<img src="${fileData}" alt="صورة" style="max-width: 200px; height: auto; border: 1px solid black; border-radius: 10px;">`;
+        } else {
+          fileMessageDiv.innerHTML = `تم إرسال ملف: ${fileName}`;
+        }
+
+        chatArea.prepend(fileMessageDiv);
+        chatArea.prepend(document.createElement('br'));
+
+        // إرسال الملف إلى API
+        const response = await sendFileToAPI(fileData, fileType, fileName);
+        if (response) {
+          const botMessageDiv = document.createElement('div');
+          botMessageDiv.classList.add('bot-message');
+          botMessageDiv.style.marginRight = 'auto';
+          botMessageDiv.innerHTML = `
+            <img src="Chat SIP.png" alt="Chat SIP Logo">
+            <div class="bot-message-text">${response}</div>
+            <i class="fas fa-copy copy-icon" onclick="copyText(this)"></i>
+            <div class="copy-toast" style="display: none;">تم النسخ ✅</div>
+          `;
+          chatArea.prepend(botMessageDiv);
+          chatArea.prepend(document.createElement('br'));
+        }
+      };
+      reader.readAsDataURL(file); // قراءة الملف كـ base64
+    }
+  };
+  input.click();
+}
+async function sendFileToAPI(fileData, fileType, fileName) {
+  try {
+    const apiKey = 'AIzaSyD3FhNZjaNkWp0BdtfBlDRfydgwv0hHRH8'; // استبدل بمفتاح API الخاص بك
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=${apiKey}`;
+
+    const data = {
+      contents: [
+        {
+          parts: [
+            { text: "أنت برنامج دردشة ذكي Chat SIP. قم بتحليل الملف أو الصورة التالية وأجب على استفسار المستخدم." },
+            {
+              inline_data: {
+                mime_type: fileType, // نوع الملف (مثل image/png)
+                data: fileData.split(',')[1] // بيانات الملف (base64 بدون البادئة)
+              }
+            }
+          ]
+        }
+      ]
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result.candidates[0].content.parts[0].text; // الرد من API
+  } catch (error) {
+    console.error('Error sending file to API:', error);
+    return "عذرًا، حدث خطأ أثناء معالجة الملف. يرجى المحاولة مرة أخرى.";
+  }
+}
+
+
+
+
+
+
+// إخفاء رسالة الترحيب
+function hideWelcomeMessage() {
+  const welcomeMessage = document.querySelector('.welcome-message');
+  welcomeMessage.style.display = 'none';
+}
+
+
+        
+        
+        
+
+
+
+
+
+const userInput = document.getElementById('userInput');
+const expandButton = document.getElementById('expandButton');
+const chatContainer = document.getElementById('chatContainer');
+
+userInput.addEventListener('input', () => {
+  const lines = userInput.value.split('\n').length;
+  if (lines > 4) {
+    expandButton.style.display = 'block';
+  } else {
+    expandButton.style.display = 'none';
+  }
+});
+
+expandButton.addEventListener('click', () => {
+  if (userInput.style.height === '90vh') {
+    userInput.style.height = 'auto';
+    expandButton.innerHTML = '<i class="fas fa-expand"></i>';
+  } else {
+    userInput.style.height = '90vh';
+    expandButton.innerHTML = '<i class="fas fa-compress"></i>';
+  }
+});
+
+
+
+// إخفاء رسالة الترحيب عند إرسال الرسالة الأولى
+function hideWelcomeMessage() {
+  const welcomeMessage = document.querySelector('.welcome-message');
+  welcomeMessage.style.display = 'none';
+}
+
+        
+    </script>
+</body>
+</html>
